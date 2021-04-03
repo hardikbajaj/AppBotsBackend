@@ -6,6 +6,7 @@ var userSchema = new mongoose.Schema({
     firstName : {type:String, required:true },
     lastName : {type:String, trim: true, required: true}, 
     hash_password : {type:String, required: true },
+    role: {type: String,default:'user'}
 
    },{timestamps:true})
 

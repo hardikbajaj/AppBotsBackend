@@ -7,6 +7,7 @@ const path = require('path');
 const cors= require('cors');
 const bodyParser = require('body-parser');
 const { req } = require('http');
+const jsend = require('./plugins/jsend')
 
 env.config();
 app.use(express.json());
@@ -17,18 +18,22 @@ app.use(bodyParser.urlencoded({extended:true}));
 
 const mongoURL= `mongodb+srv://${process.env.MONGO_DB_USER}:${process.env.MONGO_DB_PASSWORD}@hardik.6hxsc.mongodb.net/${process.env.MONGO_DB_DATABASE}?retryWrites=true&w=majority`;
 const localMongo= `mongodb://localhost/${process.env.MONGO_DB_DATABASE}`;
-mongoose.connect(mongoURL,
+mongoose.connect(localMongo,
  {
      useNewUrlParser: true,
-     useUnifiedTopology: true
+     useUnifiedTopology: true,
+     useFindAndModify: false
     }
 ).then(() => {
     console.log('Database Connected');
 });
 
 app.use(cors());
-
+app.use(jsend());
 app.use('/',router);
+
+
+
 app.get('/', (req, res) => {
     res.send('The Server is working awesome, Welcome to AILights');
 });

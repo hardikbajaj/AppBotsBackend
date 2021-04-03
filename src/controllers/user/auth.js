@@ -5,15 +5,15 @@ const jwt= require('jsonwebtoken');
 
 
 // Generate Token
-const generateJwtToken = (_id ) => {
-    return jwt.sign({ _id }, process.env.JWT_SECRET);
+const generateJwtToken = (_id, role ) => {
+    return jwt.sign({ _id, role }, process.env.JWT_SECRET);
   };
 
 var signUpAction = function(req,res){
 User.findOne({ email: req.body.email }).exec(async (error, user) => {
-    if(error) res.status(400).json({error});
+    if(error) res.status(400).failure({error});
     if (user)
-      return res.status(400).json({
+      return res.status(400).failure({
         error: "User Already Registered",
       });
 
@@ -29,18 +29,19 @@ User.findOne({ email: req.body.email }).exec(async (error, user) => {
 
     _user.save((error, user) => {
       if (error) {
-        return res.status(400).json({
-          message: error,
+        return res.status(400).failure({
+          error
         });
       }
 
       if (user) {
-        const token = generateJwtToken(user._id);
+        const token = generateJwtToken(user._id, user.role);
         const { _id, firstName, lastName, email, fullName } = user;
-        return res.status(201).json({
+        return res.status(201).success({
           token,
           user: { _id, firstName, lastName, email,  fullName },
-        });
+        },
+        "User Signup Successful");
       }
     });
   });
@@ -48,23 +49,23 @@ User.findOne({ email: req.body.email }).exec(async (error, user) => {
 
 var signInAction = function (req,res) {
     User.findOne({ email: req.body.email }).exec(async (error, user) => {
-        if (error) return res.status(400).json({ error });
+        if (error) return res.status(400).failure({ error });
         if (user) {
           const isPassword = await user.authenticate(req.body.password);
           if (isPassword) {
-            const token = generateJwtToken(user._id);
+            const token = generateJwtToken(user._id, user.role);
             const { _id, firstName, lastName, email,  fullName } = user;
-            res.status(200).json({
+            res.status(200).success({
               token,
               user: { _id, firstName, lastName, email, fullName },
             });
           } else {
-            return res.status(400).json({
-              message: "Something went wrong",
-            });
+            return res.status(400).failure(
+               "Wrong Password",
+            );
           }
         } else {
-          return res.status(400).json({ message: "Something went wrong" });
+          return res.status(400).failure({ error: "Something went wrong" });
         }
       });
     
