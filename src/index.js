@@ -18,7 +18,7 @@ app.use(bodyParser.urlencoded({extended:true}));
 
 const mongoURL= `mongodb+srv://${process.env.MONGO_DB_USER}:${process.env.MONGO_DB_PASSWORD}@hardik.6hxsc.mongodb.net/${process.env.MONGO_DB_DATABASE}?retryWrites=true&w=majority`;
 const localMongo= `mongodb://localhost/${process.env.MONGO_DB_DATABASE}`;
-mongoose.connect(localMongo,
+mongoose.connect(mongoURL ,
  {
      useNewUrlParser: true,
      useUnifiedTopology: true,
