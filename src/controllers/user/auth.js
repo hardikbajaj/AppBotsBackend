@@ -14,8 +14,8 @@ User.findOne({ email: req.body.email }).exec(async (error, user) => {
     if(error) res.status(400).failure({error});
     if (user)
       return res.status(400).failure({
-        error: "User Already Registered",
-      });
+        
+      }, "User Already Resgistered");
 
     const { firstName, lastName, email, password } = req.body;
     const hash_password = await bcrypt.hash(password, 10);
