@@ -2,6 +2,7 @@ const Areas = require('../../modals/area');
 const Bulbs = require('../../modals/bulb');
 
 const setIotBulbStatus = async function(req, res) {
+    let temp = 0;
     const avgPeopleData = await Areas.aggregate([
            { $project: 
             {
@@ -52,33 +53,53 @@ const setIotBulbStatus = async function(req, res) {
           
 
         ])
-    
-    avgPeopleData.map(async (data, index) => {
+    console.log(avgPeopleData)
+    let ref = null;
+    const setStatusFalse = await Bulbs.updateMany({},{$set:{status:false}})
+    if(setStatusFalse){
+   ref = await Promise.all( avgPeopleData.map(async (data, index) => {
         //console.log(data)
+        
+        
         const articleId= data._id;
         const details = await Areas.findById({_id:articleId}).select('bulbs').lean();
         console.log(details)
         const length = Math.min(details.bulbs.length, data.bulbsOn);
-        const bulbId = details.bulbs[0]._id
-        const temp = await Bulbs.find({})
-        console.log(temp+'temp')
+        //const bulbId = details.bulbs[0]._id
+        //const temp = await Bulbs.find({})
+        // console.log(temp+'temp')
+       
         for  (let i = 0; i < length; i++) {
             console.log('Loop+ '+details.bulbs[i]._id)
-            await Bulbs.findByIdAndUpdate({_id: details.bulbs[i].bulb_id},{$set:{
+            Bulbs.findByIdAndUpdate({_id: details.bulbs[i].bulb_id},{$set:{
               status: true  
             }},
                 (error, respo) => {
                    
                     if (error) return res.status(400).failure({ error });
+                   
                     if (respo && i == length-1) {
-                        return res.status(200).success({}, "All Bulbs are updated as per the Visitor's Frequency")
+                        return `Array  ${index} Completed`
+                        console.log('updated')
+                        
+                       // res.status(200).success({}, "All Bulbs are updated as per the Visitor's Frequency")
                     }
                 }
             )
         }
+        if(length === 0){
+            return '0 length'
+        }
+       
+        
 
-    })
-    console.log(avgPeopleData)
+    }))
+}
+    if(ref){
+        res.status(200).success({}, "All Bulbs are updated as per the Visitor's Frequency")
+        }
+
+   // res.status(200).success({}, "All Bulbs are updated as per the Visitor's Frequency")
 
 }
 
@@ -95,8 +116,14 @@ const setBulbStatusById = async function(req, res) {
     })))
 }
 
+const falseAll = async function(req, res) {
+    const setStatusFalse = await Bulbs.updateMany({},{$set:{status:false}})
+    res.status(200).success(setStatusFalse, "done")
+}
+
 
 module.exports={
     setIotBulbStatus,
-    setBulbStatusById
+    setBulbStatusById,
+    falseAll
 }

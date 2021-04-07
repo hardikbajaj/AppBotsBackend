@@ -2,7 +2,7 @@ const express = require('express');
 const { validateSignupRequest, validateSigninRequest, isRequestValidated } = require('../validators/auth');
 const auth = require('../controllers/admin/auth');
 const { addArea, addBulbToArea, addPeopleCountArea } = require('../controllers/admin/areas');
-const { setIotBulbStatus, setBulbStatusById } = require('../controllers/admin/bulb');
+const { setIotBulbStatus, setBulbStatusById, falseAll } = require('../controllers/admin/bulb');
 const { requireSignin, isAdmin } = require('../middleware');
 const { getAreas } = require('../controllers/areas');
 const { getBulbsByArea } = require('../controllers/bulbs');
@@ -18,6 +18,7 @@ router.post('/bulbs/add',requireSignin, isAdmin, addBulbToArea);
 router.post('/people/add',requireSignin,isAdmin, addPeopleCountArea);
 router.post('/reset/bulb', requireSignin,isAdmin,setIotBulbStatus);
 router.post('/set/bulb',requireSignin,isAdmin, setBulbStatusById);
+
 
 router.get('/area',requireSignin,isAdmin,  getAreas);
 router.get('/bulbs/area/:id',requireSignin,isAdmin,  getBulbsByArea)

@@ -41,22 +41,23 @@ const addBulbToArea = async function(req, res) {
                         bulb_id: savedBulb._id
                     }
                     bulbs.push(obj);
+                    if(i == count-1){
+                        console.log(bulbs)
+                        Areas.findByIdAndUpdate({_id: areaId},{$set: {
+                            bulbs: bulbs
+                        }},{new:true, }).exec((error, data)=>{
+                            if (error) return res.status(400).failure({ error });
+                                if(data){
+                                    return res.status(200).success( data );
+                                }
+                        })
+                    }
                 //    const doc = await Areas.findByIdAndUpdate({_id: areaId}).bulbs.set(
                 //     i, savedBulb._id
                 // )
                    
                 }
-                if(i == count-1){
-                    console.log(bulbs)
-                    Areas.findByIdAndUpdate({_id: areaId},{$set: {
-                        bulbs: bulbs
-                    }},{new:true, }).exec((error, data)=>{
-                        if (error) return res.status(400).failure({ error });
-                            if(data){
-                                return res.status(200).success( data );
-                            }
-                    })
-                }
+                
             })            
         }
       }
