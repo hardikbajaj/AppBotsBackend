@@ -10,6 +10,7 @@ const generateJwtToken = (_id, role ) => {
   };
 
 var signUpAction = function(req,res){
+
 User.findOne({ email: req.body.email }).exec(async (error, user) => {
     if(error) res.status(400).failure({error});
     if (user)
